@@ -12,8 +12,8 @@
 		676A07322AF0269E00726F27 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676A07312AF0269E00726F27 /* MainViewController.swift */; };
 		676A07372AF026A000726F27 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 676A07362AF026A000726F27 /* Assets.xcassets */; };
 		676A073A2AF026A000726F27 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 676A07382AF026A000726F27 /* LaunchScreen.storyboard */; };
-		676A07452AF028AB00726F27 /* JobDto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676A07442AF028AB00726F27 /* JobDto.swift */; };
 		676A07482AF02AB500726F27 /* JobModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676A07472AF02AB500726F27 /* JobModel.swift */; };
+		676A074B2AF031DE00726F27 /* APIController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676A074A2AF031DE00726F27 /* APIController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,8 +24,8 @@
 		676A07362AF026A000726F27 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		676A07392AF026A000726F27 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		676A073B2AF026A000726F27 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		676A07442AF028AB00726F27 /* JobDto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobDto.swift; sourceTree = "<group>"; };
 		676A07472AF02AB500726F27 /* JobModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobModel.swift; sourceTree = "<group>"; };
+		676A074A2AF031DE00726F27 /* APIController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +63,7 @@
 				676A07412AF0282C00726F27 /* Model */,
 				676A07422AF0283200726F27 /* View */,
 				676A07432AF0283800726F27 /* Presenter */,
+				676A07492AF030FB00726F27 /* Network */,
 				676A07362AF026A000726F27 /* Assets.xcassets */,
 				676A07382AF026A000726F27 /* LaunchScreen.storyboard */,
 				676A073B2AF026A000726F27 /* Info.plist */,
@@ -97,9 +98,16 @@
 		676A07462AF0292A00726F27 /* DTO */ = {
 			isa = PBXGroup;
 			children = (
-				676A07442AF028AB00726F27 /* JobDto.swift */,
 			);
 			path = DTO;
+			sourceTree = "<group>";
+		};
+		676A07492AF030FB00726F27 /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				676A074A2AF031DE00726F27 /* APIController.swift */,
+			);
+			path = Network;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -174,8 +182,8 @@
 			files = (
 				676A07322AF0269E00726F27 /* MainViewController.swift in Sources */,
 				676A072E2AF0269E00726F27 /* AppDelegate.swift in Sources */,
+				676A074B2AF031DE00726F27 /* APIController.swift in Sources */,
 				676A07302AF0269E00726F27 /* SceneDelegate.swift in Sources */,
-				676A07452AF028AB00726F27 /* JobDto.swift in Sources */,
 				676A07482AF02AB500726F27 /* JobModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -7,10 +7,12 @@
 
 import Foundation
 
-struct JobModel {
+struct JobModel: Decodable {
     let salary: Double
     let profession, id: String
     let date: Date
     let employer: String
     let logo: URL?
 }
+
+typealias JobModels = [JobModel]
