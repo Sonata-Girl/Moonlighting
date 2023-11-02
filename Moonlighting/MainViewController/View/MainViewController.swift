@@ -14,10 +14,8 @@ private enum RecipeListSection: Int {
 final class MainViewController: UIViewController {
     
     // MARK: Properties
-    
-    private var jobList: [JobModel] = []
-    private var filteredJobList: [JobModel] = []
-    
+    var presenter: MainPresenterProtocol?
+        
     private var isSearchBarEmpty: Bool {
         return searchController.searchBar.text?.isEmpty ?? true
     }
@@ -30,7 +28,7 @@ final class MainViewController: UIViewController {
     
     private var searchController: UISearchController = {
         let sb = UISearchController()
-        sb.searchBar.placeholder = "Enter employer/profession"
+        sb.searchBar.placeholder = "Поиск"
         sb.searchBar.searchBarStyle = .minimal
         return sb
     }()
@@ -46,8 +44,10 @@ final class MainViewController: UIViewController {
             forCellWithReuseIdentifier: JobCell.identifier
         )
         collectionView.showsVerticalScrollIndicator = false
+        collectionView.backgroundColor = .appLightGrayColor()
         collectionView.dataSource = self
         collectionView.delegate = self
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }()
     
@@ -58,6 +58,9 @@ final class MainViewController: UIViewController {
         setupHierarchy()
         setupLayout()
         configureView()
+        configureSearchBar()
+        
+        presenter?.getJobs()
     }
 }
 
@@ -65,7 +68,6 @@ final class MainViewController: UIViewController {
 
 private extension MainViewController {
     func setupHierarchy() {
-        view.addSubview(searchController.searchBar)
         view.addSubview(jobsCollectionView)
     }
 }
@@ -74,13 +76,11 @@ private extension MainViewController {
 
 private extension MainViewController {
     func setupLayout() {
-        view.subviews.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
-        
         NSLayoutConstraint.activate([
             jobsCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             jobsCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            jobsCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor,constant: 10),
-            view.safeAreaLayoutGuide.trailingAnchor.constraint(equalTo: jobsCollectionView.trailingAnchor,constant: 10)
+            jobsCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            jobsCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
     }
 }
@@ -102,7 +102,8 @@ private extension MainViewController {
     }
     
     func filterContentForSearchText(_ searchText: String) {
-        filteredJobList = jobList.filter { jobModel in
+        guard let presenter = presenter else { return }
+        presenter.filteredJobs = presenter.jobs.filter { jobModel in
             if isSearchBarEmpty {
                 return false
             } else {
@@ -127,29 +128,28 @@ private extension MainViewController {
     func createLayout() -> UICollectionViewCompositionalLayout {
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1),
-            heightDimension: .fractionalHeight(1)
+            heightDimension: .absolute(105)
         )
-    
+
         let layoutItem = NSCollectionLayoutItem(layoutSize: itemSize)
         
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1),
-            heightDimension: .fractionalWidth(1)
+            heightDimension: .absolute(105)
         )
         let layoutGroup = NSCollectionLayoutGroup.horizontal(
             layoutSize: groupSize,
             subitems: [layoutItem]
         )
-        layoutGroup.interItemSpacing = .fixed(5)
         
         let layoutSection = NSCollectionLayoutSection(group: layoutGroup)
         layoutSection.contentInsets = .init(
-            top: 5,
-            leading: 5,
-            bottom: 5,
-            trailing: 5
+            top: 10,
+            leading: 10,
+            bottom: 10,
+            trailing: 10
         )
-        layoutSection.interGroupSpacing = 5
+        layoutSection.interGroupSpacing = 10
         return UICollectionViewCompositionalLayout(section: layoutSection)
     }
 }
@@ -159,19 +159,44 @@ private extension MainViewController {
 extension MainViewController: UICollectionViewDelegate {
 }
 
+// MARK: - Loading data with network service
+
+extension MainViewController: MainViewProtocol {
+    func jobsLoaded() {
+        jobsCollectionView.reloadData()
+    }
+    
+    func imageLoaded(indexJob: Int) {
+        let indexPath = IndexPath(item: indexJob, section: 0)
+        jobsCollectionView.reloadItems(at: [indexPath])
+    }
+    
+    func failure(error: Error) {
+        print(error.localizedDescription)
+    }
+}
+
 // MARK: - CollectionViewDataSource
 
 extension MainViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if isFiltering {
-           return filteredJobList.count
-         }
-           
-         return jobList.count
+            return presenter?.filteredJobs.count ?? 0
+        }
+        return presenter?.jobs.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        jobsCollectionView.dequeueReusableCell(withReuseIdentifier: JobCell.identifier, for: indexPath)
+        guard let jobs = presenter?.jobs,
+              let cell = jobsCollectionView.dequeueReusableCell(withReuseIdentifier: JobCell.identifier, for: indexPath) as? JobCell else { return JobCell() }
+        
+        let item = jobs[indexPath.row]
+        
+        if item.logoData == nil {
+            presenter?.loadImage(jobModel: item, indexItem: indexPath.row)
+        }
+        cell.configureCell(jobModel: item)
+        return cell
     }
 }
 

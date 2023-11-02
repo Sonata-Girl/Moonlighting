@@ -11,4 +11,15 @@ protocol Builder {
     static func createMainViewController() -> UIViewController
 }
 
-final class Builder: Builder
+final class ModuleBuilder: Builder {
+    static func createMainViewController() -> UIViewController {
+        let view = MainViewController()
+        let networkManager = NetworkService()
+        let presenter = MainViewControllerPresenter(
+            view: view,
+            networkManager: networkManager
+        )
+        view.presenter = presenter
+        return view
+    }
+}

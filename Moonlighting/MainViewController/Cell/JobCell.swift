@@ -8,114 +8,146 @@
 import UIKit
 
 final class JobCell: UICollectionViewCell {
-    
+
     // MARK: UIElements
-    
-    private let mainStackView: UIStackView = {
+
+    private let mainView: UIStackView = {
         let stackView = UIStackView()
-        stackView.axis = .vertical
-        stackView.distribution = .equalSpacing
-        stackView.spacing = 2
-        return stackView
-    }()
-    
-    private let topStackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .horizontal
         stackView.distribution = .fillEqually
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.layer.cornerRadius = Constants.mediumCornerRadius
         return stackView
     }()
+
+    // MARK: Top view UI
     
+    private let topView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+
     private let jobNameLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 20)
+        label.font = .systemFont(
+            ofSize: 20,
+            weight: .medium
+        )
         label.textColor = .label
         label.textAlignment = .left
+        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
-    private let salaryView: UIView = {
-        let view = UIView()
-        view.layer.cornerRadius = Constants.lightCornerRadius
-        view.backgroundColor = .appYellowColor()
-        return view
-    }()
-    
+
     private let salaryLabel: UILabel = {
-        let label = UILabel()
-        label.font = Constants.smallFont
+        let label = PaddingLabel(
+            insets: .init(
+                top: 0,
+                left: 5,
+                bottom: 0,
+                right: 5)
+        )
         label.textColor = .label
+        label.clipsToBounds = true
         label.textAlignment = .center
+        label.font = Constants.smallFont
+        label.backgroundColor = .appYellowColor()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.layer.cornerRadius = Constants.lightCornerRadius
         return label
     }()
-    
+
     private let separatorView: UIView = {
         let view = UIView()
-        view.backgroundColor = .gray
+        view.backgroundColor = .appLightGrayColor()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+
+   // MARK: Bottom View UI
+
+    private let bottomView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
-    private let bottomStackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .horizontal
-        stackView.distribution = .fillEqually
-        return stackView
-    }()
-    
-    private var employerImageView: UIImageView = {
+    private let employerImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.backgroundColor = .lightGray
+        imageView.clipsToBounds = true
         imageView.contentMode = .scaleAspectFill
-        imageView.layer.cornerRadius = 20
+        imageView.backgroundColor = UIColor.appLightGrayColor()
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.layer.cornerRadius = Constants.mediumCornerRadius
         return imageView
     }()
     
     private let employerLabel: UILabel = {
         let label = UILabel()
-        label.font = Constants.smallFont
         label.textColor = .label
         label.textAlignment = .left
+        label.font = UIFont.systemFont(
+            ofSize: 15,
+            weight: .medium
+        )
+        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
-    private let dateView: UIView = {
-        let view = UIView()
-        view.layer.cornerRadius = Constants.lightCornerRadius
-        view.backgroundColor = .gray
-        return view
+
+    private let dateTimeStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.distribution = .fillEqually
+        stackView.spacing = 2
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
     }()
-    
+
     private let dateLabel: UILabel = {
-        let label = UILabel()
-        label.font = Constants.smallFont
+        let label = PaddingLabel(
+            insets: .init(
+                top: 0,
+                left: 3,
+                bottom: 0,
+                right: 3)
+        )
         label.textColor = .label
+        label.clipsToBounds = true
         label.textAlignment = .center
+        label.font = Constants.smallFont
+        label.backgroundColor = .appLightGrayColor()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.layer.cornerRadius = Constants.lightCornerRadius
         return label
-    }()
-    
-    private let timeView: UIView = {
-        let view = UIView()
-        view.layer.cornerRadius = Constants.lightCornerRadius
-        view.backgroundColor = .gray
-        return view
     }()
     
     private let timeLabel: UILabel = {
-        let label = UILabel()
-        label.font = Constants.smallFont
+        let label = PaddingLabel(
+            insets: .init(
+                top: 0,
+                left: 3,
+                bottom: 0,
+                right: 3)
+        )
         label.textColor = .label
+        label.clipsToBounds = true
         label.textAlignment = .center
+        label.font = Constants.smallFont
+        label.backgroundColor = .appLightGrayColor()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.layer.cornerRadius = Constants.lightCornerRadius
         return label
     }()
 
     // MARK: Init
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupHierarchy()
         setupLayout()
+        configureView()
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -125,8 +157,13 @@ final class JobCell: UICollectionViewCell {
 
 private extension JobCell {
     func configureView() {
-        contentView.layer.cornerRadius = 12
-        contentView.layer.borderColor = UIColor.appYellowColor().cgColor
+        backgroundColor = .white
+        layer.cornerRadius = Constants.mediumCornerRadius
+    }
+    
+    func setDefaultBorder() {
+        layer.borderWidth = 1
+        layer.borderColor = UIColor.appLightGrayColor().cgColor
     }
 }
 
@@ -134,22 +171,20 @@ private extension JobCell {
 
 private extension JobCell {
     func setupHierarchy() {
-        addSubview(mainStackView)
-        mainStackView.addArrangedSubview(topStackView)
-        mainStackView.addArrangedSubview(separatorView)
-        mainStackView.addArrangedSubview(bottomStackView)
+        addSubview(mainView)
+        mainView.addSubview(topView)
+        mainView.addSubview(separatorView)
+        mainView.addSubview(bottomView)
+
+        topView.addSubview(jobNameLabel)
+        topView.addSubview(salaryLabel)
+
+        bottomView.addSubview(employerImageView)
         
-        topStackView.addArrangedSubview(jobNameLabel)
-        topStackView.addArrangedSubview(salaryView)
-        salaryView.addSubview(salaryLabel)
-        
-        bottomStackView.addArrangedSubview(employerImageView)
-        bottomStackView.addArrangedSubview(employerLabel)
-        bottomStackView.addArrangedSubview(dateView)
-        bottomStackView.addArrangedSubview(timeView)
-        
-        dateView.addSubview(dateLabel)
-        timeView.addSubview(timeLabel)
+        bottomView.addSubview(employerLabel)
+        bottomView.addSubview(dateTimeStackView)
+        dateTimeStackView.addArrangedSubview(dateLabel)
+        dateTimeStackView.addArrangedSubview(timeLabel)
     }
 }
 
@@ -157,41 +192,151 @@ private extension JobCell {
 
 private extension JobCell {
     func setupLayout() {
-        addSubview(mainStackView)
-        subviews.forEach {$0.translatesAutoresizingMaskIntoConstraints = false }
+        let quarterSizeWidthCell = bounds.width/3.8
+       
+        // MARK: Main stack constraints
         
         NSLayoutConstraint.activate([
-            mainStackView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            mainStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-            mainStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            mainStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
+            mainView.topAnchor.constraint(equalTo: topAnchor),
+            mainView.leftAnchor.constraint(
+                equalTo: leftAnchor,
+                constant: Constants.indentFromSuperView
+            ),
+            rightAnchor.constraint(
+                equalTo: mainView.rightAnchor,
+                constant: Constants.indentFromSuperView
+            ),
+            mainView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
+
+        // MARK: Top view constraints
+       
+        NSLayoutConstraint.activate([
+            topView.topAnchor.constraint(equalTo: mainView.topAnchor),
+            topView.leftAnchor.constraint(equalTo: mainView.leftAnchor),
+            mainView.rightAnchor.constraint(equalTo: topView.rightAnchor),
+            topView.heightAnchor.constraint(equalToConstant: Constants.heightOfCellParts)
+         ])
+        
+        NSLayoutConstraint.activate([
+            jobNameLabel.topAnchor.constraint(equalTo: topView.topAnchor),
+            jobNameLabel.leftAnchor.constraint(equalTo: topView.leftAnchor),
+            jobNameLabel.bottomAnchor.constraint(equalTo: topView.bottomAnchor),
+        ])
+
+         NSLayoutConstraint.activate([
+            salaryLabel.topAnchor.constraint(
+                equalTo: topView.topAnchor,
+                constant: Constants.mediumSpacingItems
+            ),
+            salaryLabel.leftAnchor.constraint(equalTo: jobNameLabel.rightAnchor),
+            salaryLabel.rightAnchor.constraint(equalTo: topView.rightAnchor),
+            topView.bottomAnchor.constraint(
+                equalTo: salaryLabel.bottomAnchor,
+                constant: Constants.mediumSpacingItems
+            ),
+            salaryLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: 10)
+        ])
+        salaryLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        salaryLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+
+        // MARK: Separator constraints
+       
+        NSLayoutConstraint.activate([
+            separatorView.topAnchor.constraint(equalTo: topView.bottomAnchor),
+            separatorView.leftAnchor.constraint(equalTo: mainView.leftAnchor),
+            mainView.rightAnchor.constraint(equalTo: separatorView.rightAnchor),
+            separatorView.heightAnchor.constraint(equalToConstant: 1),
+        ])
+
+        // MARK: Bottom view constraints
+       
+        NSLayoutConstraint.activate([
+            bottomView.leftAnchor.constraint(equalTo: mainView.leftAnchor),
+            mainView.rightAnchor.constraint(equalTo: bottomView.rightAnchor),
+            mainView.bottomAnchor.constraint(equalTo: bottomView.bottomAnchor),
+            bottomView.heightAnchor.constraint(equalToConstant: Constants.heightOfCellParts)
+        ])
+        
+        NSLayoutConstraint.activate([
+            employerImageView.topAnchor.constraint(
+                equalTo: bottomView.topAnchor,
+                constant: Constants.smallSpacingItems
+            ),
+            employerImageView.leftAnchor.constraint(equalTo: bottomView.leftAnchor),
+            bottomView.bottomAnchor.constraint(
+                equalTo: employerImageView.bottomAnchor,
+                constant: Constants.smallSpacingItems
+            ),
+            employerImageView.widthAnchor.constraint(equalToConstant: 32),
+        ])
+        
+        NSLayoutConstraint.activate([
+            employerLabel.topAnchor.constraint(
+                equalTo: bottomView.topAnchor,
+                constant: Constants.mediumSpacingItems
+            ),
+            employerLabel.leftAnchor.constraint(
+                equalTo: employerImageView.rightAnchor,
+                constant: Constants.mediumSpacingItems
+            ),
+            bottomView.bottomAnchor.constraint(
+                equalTo: employerLabel.bottomAnchor,
+                constant: Constants.mediumSpacingItems
+            ),
+        ])
+        
+        NSLayoutConstraint.activate([
+            dateTimeStackView.topAnchor.constraint(
+                equalTo: bottomView.topAnchor,
+                constant: Constants.mediumSpacingItems
+            ),
+            dateTimeStackView.rightAnchor.constraint(equalTo: bottomView.rightAnchor),
+            bottomView.bottomAnchor.constraint(
+                equalTo: dateTimeStackView.bottomAnchor,
+                constant: Constants.mediumSpacingItems
+            ),
+            dateTimeStackView.leftAnchor.constraint(
+                equalTo: employerLabel.rightAnchor,
+                constant: Constants.mediumSpacingItems
+            ),
+            dateTimeStackView.widthAnchor.constraint(greaterThanOrEqualToConstant: quarterSizeWidthCell)
+        ])
+        
+        dateLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        dateLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+
+        timeLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        timeLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+
     }
 }
 
-// MARK: - Setup properties
+// MARK: - Configure cell
 
 extension JobCell {
     func configureCell(jobModel: JobModel) {
-        jobNameLabel.text = jobModel.employer
-        salaryLabel.text = String(jobModel.salary)
-        if let dataImage = jobModel.logoData {
-            employerImageView.image = UIImage(data: dataImage)
-        }
+        jobNameLabel.text = jobModel.profession
+        salaryLabel.text = "\(String(format: "%.2f", jobModel.salary)) \(Constants.rubSymbol)"
         employerLabel.text = jobModel.employer
         dateLabel.text = jobModel.dateDay
         timeLabel.text = jobModel.dateTime
+
+        if let logoData = jobModel.logoData {
+            employerImageView.image = UIImage(data: logoData)
+        }
     }
-    
+
     func changeStateOfCell(selected: Bool) {
         switch selected {
         case true :
-            contentView.layer.borderWidth = 3
+            layer.borderColor = UIColor.appYellowColor().cgColor
+            layer.borderWidth = 2
         case false :
-            contentView.layer.borderWidth = 0
+                setDefaultBorder()
         }
     }
-    
+
     override func prepareForReuse() {
         jobNameLabel.text = nil
         salaryLabel.text = nil
@@ -214,7 +359,15 @@ extension JobCell {
 
 private enum Constants {
     static var lightCornerRadius: CGFloat = 6
-
+    static var mediumCornerRadius: CGFloat = 15
+    
     static var smallFont: UIFont = .systemFont(ofSize: 15)
+    
+    static var indentFromSuperView: CGFloat = 20
+    static var mediumSpacingItems: CGFloat = 15
+    static var smallSpacingItems: CGFloat = 10
+    static var heightOfCellParts: CGFloat = 52
+    
+    static var rubSymbol = "₽"
     
 }
