@@ -14,10 +14,13 @@ struct JobModel: Hashable {
     let employer: String
     let salary: Double
     let date: String
+    var isSelected: Bool
     var logoData: Data?
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
+        hasher.combine(employer)
+        hasher.combine(profession)
     }
     static func == (lhs: JobModel, rhs: JobModel) -> Bool {
         lhs.id == rhs.id &&
@@ -37,6 +40,7 @@ extension JobModel {
         self.salary = dto.salary
         self.date = dto.date
         self.logoData = logoData
+        self.isSelected = false
     }
 }
 

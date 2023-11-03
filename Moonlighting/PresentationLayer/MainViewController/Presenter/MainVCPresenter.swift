@@ -11,7 +11,7 @@ import Foundation
 
 protocol MainViewProtocol: AnyObject {
     func jobsLoaded()
-    func imageLoaded(indexJob: Int)
+    func imageLoaded()
     func failure(error: Error)
 }
 
@@ -63,7 +63,7 @@ final class MainViewControllerPresenter: MainPresenterProtocol {
                   let imageData = result else { return }
             DispatchQueue.main.async {
                 self.jobs[indexItem].logoData = imageData
-                self.view?.imageLoaded(indexJob: indexItem)
+                self.view?.imageLoaded()
             }
         }
     }

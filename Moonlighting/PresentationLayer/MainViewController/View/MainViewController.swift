@@ -46,8 +46,29 @@ final class MainViewController: UIViewController {
         )
         collectionView.showsVerticalScrollIndicator = false
         collectionView.backgroundColor = .appLightGrayColor()
+        collectionView.delegate = self
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
+    }()
+    
+    private let reserveView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .white.withAlphaComponent(0.9)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    private let reserveButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Выберите подработки", for: .normal)
+        button.setTitleColor(.gray, for: .normal)
+        button.setTitleColor(.black, for: .disabled)
+        button.backgroundColor = .appLightGrayColor()
+        button.layer.cornerRadius = 8
+        button.isEnabled = false
+        button.addTarget(nil, action: #selector(reserveButtonPressed), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
     }()
     
     // MARK: - View controller lifecycle methods
@@ -77,6 +98,8 @@ private extension MainViewController {
 private extension MainViewController {
     func additionSubviews() {
         view.addSubview(jobsCollectionView)
+        view.addSubview(reserveView)
+        reserveView.addSubview(reserveButton)
     }
 }
 
@@ -89,6 +112,21 @@ private extension MainViewController {
             jobsCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             jobsCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             jobsCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
+        
+        NSLayoutConstraint.activate([
+            reserveView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            reserveView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            reserveView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            reserveView.heightAnchor.constraint(equalToConstant: Constants.cellHeight + Constants.indentFromSuperView)
+        ])
+        
+        NSLayoutConstraint.activate([
+            reserveButton.topAnchor.constraint(equalTo: reserveView.topAnchor, constant: Constants.indentFromSuperView),
+            reserveButton.bottomAnchor.constraint(equalTo: reserveView.bottomAnchor, constant: Constants.indentFromSuperView),
+            reserveButton.leadingAnchor.constraint(equalTo: reserveView.leadingAnchor, constant: Constants.indentFromSuperView),
+            view.safeAreaLayoutGuide.trailingAnchor.constraint(equalTo: reserveButton.trailingAnchor, constant: Constants.indentFromSuperView),
+            reserveButton.heightAnchor.constraint(equalTo: reserveView.heightAnchor,multiplier: 0.4)
         ])
     }
 }
@@ -111,9 +149,9 @@ private extension MainViewController {
             }
         }
         if isSearchBarEmpty {
-            updateData(items: presenter.jobs, withAnimation: true)
+            createDataSnapshot(items: presenter.jobs)
         } else {
-            updateData(items: presenter.filteredJobs, withAnimation: true)
+            createDataSnapshot(items: presenter.filteredJobs)
         }
     }
 }
@@ -133,14 +171,14 @@ private extension MainViewController {
     func createLayout() -> UICollectionViewCompositionalLayout {
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1),
-            heightDimension: .absolute(105)
+            heightDimension: .absolute(Constants.cellHeight)
         )
 
         let layoutItem = NSCollectionLayoutItem(layoutSize: itemSize)
         
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1),
-            heightDimension: .absolute(105)
+            heightDimension: .absolute(Constants.cellHeight)
         )
         let layoutGroup = NSCollectionLayoutGroup.horizontal(
             layoutSize: groupSize,
@@ -180,11 +218,27 @@ private extension MainViewController {
         }
     }
     
-    func updateData(items: JobsModel, withAnimation: Bool) {
+    func createDataSnapshot(items: JobsModel, withAnimation: Bool = true) {
         var snapshot = NSDiffableDataSourceSnapshot<Section, JobModel>()
         snapshot.appendSections([.main])
         snapshot.appendItems(items)
-        dataSource?.apply(snapshot, animatingDifferences: true, completion: nil)
+        dataSource?.apply(snapshot, animatingDifferences: withAnimation, completion: nil)
+    }
+    
+    func updateDataSnapshot(withAnimation: Bool = true) {
+        guard let presenter = presenter,
+              var updatedSnapshot = dataSource?.snapshot()
+        else { return }
+        updatedSnapshot.reloadItems(presenter.jobs)
+        dataSource?.apply(updatedSnapshot, animatingDifferences: true)
+    }
+}
+
+extension MainViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let item = presenter?.jobs[indexPath.item] else { return }
+        presenter?.jobs[indexPath.item].isSelected = !item.isSelected
+        updateDataSnapshot()
     }
 }
 
@@ -193,16 +247,11 @@ private extension MainViewController {
 extension MainViewController: MainViewProtocol {
     func jobsLoaded() {
         guard let presenter = presenter else { return }
-        updateData(items: presenter.jobs, withAnimation: true)
+        createDataSnapshot(items: presenter.jobs, withAnimation: true)
     }
     
-    func imageLoaded(indexJob: Int) {
-        guard 
-            let jobs = presenter?.jobs,
-            var updatedSnapshot = dataSource?.snapshot() 
-        else { return }
-        updatedSnapshot.reloadItems(jobs)
-        dataSource?.apply(updatedSnapshot, animatingDifferences: true)
+    func imageLoaded() {
+        updateDataSnapshot()
     }
     
     func failure(error: Error) {
@@ -210,14 +259,20 @@ extension MainViewController: MainViewProtocol {
     }
 }
 
+// MARK: - Handle actions methods
+
+private extension MainViewController {
+    
+    @objc func reserveButtonPressed() {
+        print("hello")
+    }
+}
+
 // MARK: - Constants
 
 private enum Constants {
-    static var halfOfPointAlpha: CGFloat = 0.5
-    static var veryLightAlpha: CGFloat = 0.2
-    
-    static let gifViewRadius: CGFloat = 8
-    static let spacingStackView: CGFloat = 5
+    static var indentFromSuperView: CGFloat = 20
+    static let cellHeight: CGFloat = 105
 }
 
 

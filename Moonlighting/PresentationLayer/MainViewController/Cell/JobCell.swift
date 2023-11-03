@@ -8,7 +8,7 @@
 import UIKit
 
 final class JobCell: UICollectionViewCell {
-
+    
     // MARK: UI elements
 
     private let mainView: UIStackView = {
@@ -163,7 +163,7 @@ private extension JobCell {
         layer.cornerRadius = Constants.mediumCornerRadius
     }
     
-    func setDefaultBorder() {
+    func setDefaultStateCell() {
         layer.borderWidth = 1
         layer.borderColor = UIColor.appLightGrayColor().cgColor
     }
@@ -327,15 +327,17 @@ extension JobCell {
         if let logoData = jobModel.logoData {
             employerImageView.image = UIImage(data: logoData)
         }
+        changeStateOfCell(selected: jobModel.isSelected)
     }
 
     func changeStateOfCell(selected: Bool) {
+        isSelected = selected
         switch selected {
         case true :
             layer.borderColor = UIColor.appYellowColor().cgColor
             layer.borderWidth = 2
         case false :
-                setDefaultBorder()
+            setDefaultStateCell()
         }
     }
 
@@ -345,7 +347,8 @@ extension JobCell {
         employerLabel.text = nil
         dateLabel.text = nil
         timeLabel.text = nil
-        contentView.layer.borderWidth = 0
+        employerImageView.image = nil
+        setDefaultStateCell()
     }
 }
 
@@ -363,12 +366,12 @@ private enum Constants {
     static var lightCornerRadius: CGFloat = 6
     static var mediumCornerRadius: CGFloat = 15
     
-    static var smallFont: UIFont = .systemFont(ofSize: 15)
-    
     static var indentFromSuperView: CGFloat = 20
     static var mediumSpacingItems: CGFloat = 15
     static var smallSpacingItems: CGFloat = 10
+    
     static var heightOfCellParts: CGFloat = 52
     
+    static var smallFont: UIFont = .systemFont(ofSize: 15)
     static var rubSymbol = "₽"
 }
