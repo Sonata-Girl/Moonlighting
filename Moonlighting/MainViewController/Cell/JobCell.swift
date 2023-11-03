@@ -79,6 +79,7 @@ final class JobCell: UICollectionViewCell {
         imageView.backgroundColor = UIColor.appLightGrayColor()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.layer.cornerRadius = Constants.mediumCornerRadius
+        imageView.image = UIImage(named: "noLogo")
         return imageView
     }()
     

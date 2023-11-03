@@ -7,7 +7,7 @@
 
 import UIKit
 
-private enum RecipeListSection: Int {
+private enum Section: Int {
     case main
 }
 
@@ -154,6 +154,37 @@ private extension MainViewController {
     }
 }
 
+private extension MainViewController {
+    func setupDataSource() {
+        jobsCollectionView.dataSource =
+        UICollectionViewDiffableDataSource<Section, ImageItem>(collectionView: collectionView) {
+            (collectionView: UICollectionView, indexPath: IndexPath, item: ImageItem) -> UICollectionViewCell? in
+            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: ImageItem)
+        }
+        
+        let cellRegistration = UICollectionView.CellRegistration<UICollectionViewCell, ImageItem> { (cell, indexPath, item) in
+            var content = UIListContentConfiguration.cell()
+            content.directionalLayoutMargins = .zero
+            content.axesPreservingSuperviewLayoutMargins = []
+            content.image = item.image
+            
+            ImageCache.publicCache.load(url: item.url as NSURL, item: item) { (fetchedItem, image) in
+                if let img = image, img != fetchedItem.image {
+                    var updatedSnapshot = jobsCollectionView.dataSource.snapshot()
+                    if let datasourceIndex = updatedSnapshot.indexOfItem(fetchedItem) {
+                        let item = self.imageObjects[datasourceIndex]
+                        item.image = img
+                        updatedSnapshot.reloadItems([item])
+                        self.dataSource.apply(updatedSnapshot, animatingDifferences: true)
+                    }
+                }
+            }
+            cell.contentConfiguration = content
+        }
+       
+    }
+}
+
 // MARK: - CollectionViewDelegate
 
 extension MainViewController: UICollectionViewDelegate {
@@ -187,7 +218,7 @@ extension MainViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let jobs = presenter?.jobs,
+        guard let jobs = isFiltering ?  presenter?.filteredJobs : presenter?.jobs,
               let cell = jobsCollectionView.dequeueReusableCell(withReuseIdentifier: JobCell.identifier, for: indexPath) as? JobCell else { return JobCell() }
         
         let item = jobs[indexPath.row]
