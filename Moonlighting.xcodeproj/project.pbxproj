@@ -72,14 +72,8 @@
 		676A072C2AF0269E00726F27 /* Moonlighting */ = {
 			isa = PBXGroup;
 			children = (
-				676A07552AF15B9000726F27 /* AppDelegate */,
-				676A07592AF18C5900726F27 /* Builder */,
-				676A07412AF0282C00726F27 /* Model */,
-				676A07532AF144CA00726F27 /* MainViewController */,
-				676A07492AF030FB00726F27 /* Network */,
-				676A074E2AF0ECA800726F27 /* Extensions */,
-				676A07652AF3DACE00726F27 /* CustomUI */,
-				676A076E2AF44A5600726F27 /* Cache */,
+				676A07752AF57F2700726F27 /* ApplicationLayer */,
+				676A07742AF57EF600726F27 /* PresentationLayer */,
 				676A07362AF026A000726F27 /* Assets.xcassets */,
 				676A07382AF026A000726F27 /* LaunchScreen.storyboard */,
 				676A073B2AF026A000726F27 /* Info.plist */,
@@ -87,13 +81,13 @@
 			path = Moonlighting;
 			sourceTree = "<group>";
 		};
-		676A07412AF0282C00726F27 /* Model */ = {
+		676A07412AF0282C00726F27 /* Models */ = {
 			isa = PBXGroup;
 			children = (
 				676A07462AF0292A00726F27 /* Dto */,
 				676A07472AF02AB500726F27 /* JobModel.swift */,
 			);
-			path = Model;
+			path = Models;
 			sourceTree = "<group>";
 		};
 		676A07422AF0283200726F27 /* View */ = {
@@ -140,9 +134,10 @@
 		676A07532AF144CA00726F27 /* MainViewController */ = {
 			isa = PBXGroup;
 			children = (
+				676A07432AF0283800726F27 /* Presenter */,
 				676A07542AF15A6300726F27 /* Cell */,
 				676A07422AF0283200726F27 /* View */,
-				676A07432AF0283800726F27 /* Presenter */,
+				676A07652AF3DACE00726F27 /* CustomUI */,
 			);
 			path = MainViewController;
 			sourceTree = "<group>";
@@ -180,11 +175,24 @@
 			path = CustomUI;
 			sourceTree = "<group>";
 		};
-		676A076E2AF44A5600726F27 /* Cache */ = {
+		676A07742AF57EF600726F27 /* PresentationLayer */ = {
 			isa = PBXGroup;
 			children = (
+				676A07592AF18C5900726F27 /* Builder */,
+				676A07532AF144CA00726F27 /* MainViewController */,
 			);
-			path = Cache;
+			path = PresentationLayer;
+			sourceTree = "<group>";
+		};
+		676A07752AF57F2700726F27 /* ApplicationLayer */ = {
+			isa = PBXGroup;
+			children = (
+				676A07552AF15B9000726F27 /* AppDelegate */,
+				676A07412AF0282C00726F27 /* Models */,
+				676A074E2AF0ECA800726F27 /* Extensions */,
+				676A07492AF030FB00726F27 /* Network */,
+			);
+			path = ApplicationLayer;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

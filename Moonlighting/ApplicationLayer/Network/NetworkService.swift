@@ -7,6 +7,8 @@
 
 import Foundation
 
+// MARK: - Network service protocol
+
 protocol NetworkServiceProtocol {
     func getJobsRequest(completion: @escaping (Result<JobsDto, Error>) -> Void)
     func loadImageData(from url: URL, completion: @escaping (Data?) -> Void)
@@ -30,7 +32,7 @@ enum ApiType {
     }
 }
 
-// MARK: - Api Controller
+// MARK: - Network service
 
 final class NetworkService: NetworkServiceProtocol {
     static let shared = NetworkService()
