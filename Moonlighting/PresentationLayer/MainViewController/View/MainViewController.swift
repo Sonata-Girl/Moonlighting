@@ -7,7 +7,7 @@
 
 import UIKit
 
-private enum RecipeListSection: Int {
+private enum Section: Int {
     case main
 }
 
@@ -15,7 +15,8 @@ final class MainViewController: UIViewController {
     
     // MARK: Properties
     var presenter: MainPresenterProtocol?
-        
+    private var dataSource: UICollectionViewDiffableDataSource<Section, JobModel>?
+    
     private var isSearchBarEmpty: Bool {
         return searchController.searchBar.text?.isEmpty ?? true
     }
@@ -24,13 +25,13 @@ final class MainViewController: UIViewController {
         return searchController.isActive && !isSearchBarEmpty
     }
 
-    // MARK: UI Elements
+    // MARK: UI elements
     
     private var searchController: UISearchController = {
-        let sb = UISearchController()
-        sb.searchBar.placeholder = "Поиск"
-        sb.searchBar.searchBarStyle = .minimal
-        return sb
+        let sc = UISearchController()
+        sc.searchBar.placeholder = "Поиск"
+        sc.searchBar.searchBarStyle = .minimal
+        return sc
     }()
     
     private lazy var jobsCollectionView: UICollectionView = {
@@ -45,8 +46,6 @@ final class MainViewController: UIViewController {
         )
         collectionView.showsVerticalScrollIndicator = false
         collectionView.backgroundColor = .appLightGrayColor()
-        collectionView.dataSource = self
-        collectionView.delegate = self
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }()
@@ -55,24 +54,33 @@ final class MainViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupHierarchy()
-        setupLayout()
         configureView()
+        additionSubviews()
+        setupLayout()
         configureSearchBar()
+        setupDataSource()
         
         presenter?.getJobs()
+    }
+}
+
+// MARK: - Configure view properties
+
+private extension MainViewController {
+    func configureView() {
+        view.backgroundColor = .white
     }
 }
 
 // MARK: - Setup view
 
 private extension MainViewController {
-    func setupHierarchy() {
+    func additionSubviews() {
         view.addSubview(jobsCollectionView)
     }
 }
 
-// MARK: - Setup layouts for UIElements
+// MARK: - Setup layouts for UI
 
 private extension MainViewController {
     func setupLayout() {
@@ -82,14 +90,6 @@ private extension MainViewController {
             jobsCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             jobsCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
-    }
-}
-
-// MARK: - Configure view properties
-
-private extension MainViewController {
-    func configureView() {
-        view.backgroundColor = .white
     }
 }
 
@@ -110,16 +110,21 @@ private extension MainViewController {
                 return jobModel.employer.lowercased().contains(searchText.lowercased()) || jobModel.profession.lowercased().contains(searchText.lowercased())
             }
         }
-        jobsCollectionView.reloadData()
+        if isSearchBarEmpty {
+            updateData(items: presenter.jobs, withAnimation: true)
+        } else {
+            updateData(items: presenter.filteredJobs, withAnimation: true)
+        }
     }
 }
+
+// MARK: - Search methods
 
 extension MainViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
         guard let filter = searchController.searchBar.text else { return }
         filterContentForSearchText(filter)
     }
-    
 }
 
 // MARK: - Collection layout methods
@@ -154,49 +159,54 @@ private extension MainViewController {
     }
 }
 
-// MARK: - CollectionViewDelegate
+// MARK: - Collection DataSource setup
 
-extension MainViewController: UICollectionViewDelegate {
+private extension MainViewController {
+    func setupDataSource() {
+        dataSource = UICollectionViewDiffableDataSource<Section, JobModel>(collectionView: jobsCollectionView) { [weak self]
+            (collectionView: UICollectionView, indexPath: IndexPath, item: JobModel) -> UICollectionViewCell? in
+            guard let self,
+                  let presenter = self.presenter else { return JobCell() }
+            let jobs = self.isFiltering ?  presenter.filteredJobs : presenter.jobs
+            let cell = jobsCollectionView.dequeueReusableCell(withReuseIdentifier: JobCell.identifier, for: indexPath) as? JobCell
+            
+            let item = jobs[indexPath.row]
+            
+            if item.logoData == nil {
+                presenter.loadImage(jobModel: item, indexItem: indexPath.row)
+            }
+            cell?.configureCell(jobModel: item)
+            return cell
+        }
+    }
+    
+    func updateData(items: JobsModel, withAnimation: Bool) {
+        var snapshot = NSDiffableDataSourceSnapshot<Section, JobModel>()
+        snapshot.appendSections([.main])
+        snapshot.appendItems(items)
+        dataSource?.apply(snapshot, animatingDifferences: true, completion: nil)
+    }
 }
 
 // MARK: - Loading data with network service
 
 extension MainViewController: MainViewProtocol {
     func jobsLoaded() {
-        jobsCollectionView.reloadData()
+        guard let presenter = presenter else { return }
+        updateData(items: presenter.jobs, withAnimation: true)
     }
     
     func imageLoaded(indexJob: Int) {
-        let indexPath = IndexPath(item: indexJob, section: 0)
-        jobsCollectionView.reloadItems(at: [indexPath])
+        guard 
+            let jobs = presenter?.jobs,
+            var updatedSnapshot = dataSource?.snapshot() 
+        else { return }
+        updatedSnapshot.reloadItems(jobs)
+        dataSource?.apply(updatedSnapshot, animatingDifferences: true)
     }
     
     func failure(error: Error) {
         print(error.localizedDescription)
-    }
-}
-
-// MARK: - CollectionViewDataSource
-
-extension MainViewController: UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if isFiltering {
-            return presenter?.filteredJobs.count ?? 0
-        }
-        return presenter?.jobs.count ?? 0
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let jobs = presenter?.jobs,
-              let cell = jobsCollectionView.dequeueReusableCell(withReuseIdentifier: JobCell.identifier, for: indexPath) as? JobCell else { return JobCell() }
-        
-        let item = jobs[indexPath.row]
-        
-        if item.logoData == nil {
-            presenter?.loadImage(jobModel: item, indexItem: indexPath.row)
-        }
-        cell.configureCell(jobModel: item)
-        return cell
     }
 }
 

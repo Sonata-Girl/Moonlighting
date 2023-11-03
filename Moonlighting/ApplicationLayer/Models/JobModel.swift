@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct JobModel: Identifiable {
+struct JobModel: Hashable {
     let id: String
     let logo: URL?
     let profession: String
@@ -15,7 +15,18 @@ struct JobModel: Identifiable {
     let salary: Double
     let date: String
     var logoData: Data?
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    static func == (lhs: JobModel, rhs: JobModel) -> Bool {
+        lhs.id == rhs.id &&
+        lhs.employer == rhs.employer &&
+        lhs.profession == rhs.profession
+    }
 }
+
+// MARK: - Method convert from dto
 
 extension JobModel {
     init(from dto: JobDto, logoData: Data?) {
@@ -28,6 +39,8 @@ extension JobModel {
         self.logoData = logoData
     }
 }
+
+// MARK: - Date convert methods
 
 extension JobModel {
     var dateFromString: Date? {

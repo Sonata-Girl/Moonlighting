@@ -33,7 +33,6 @@ final class MainViewControllerPresenter: MainPresenterProtocol {
     let networkManager: NetworkServiceProtocol?
     var jobs: JobsModel = []
     var filteredJobs: JobsModel = []
-//    let cacheManager: ApiControllerProtocol?
     
     required init(view: MainViewProtocol,
         networkManager: NetworkServiceProtocol

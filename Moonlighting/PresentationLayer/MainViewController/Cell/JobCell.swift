@@ -9,7 +9,7 @@ import UIKit
 
 final class JobCell: UICollectionViewCell {
 
-    // MARK: UIElements
+    // MARK: UI elements
 
     private let mainView: UIStackView = {
         let stackView = UIStackView()
@@ -19,7 +19,7 @@ final class JobCell: UICollectionViewCell {
         return stackView
     }()
 
-    // MARK: Top view UI
+    // MARK: Top subview
     
     private let topView: UIView = {
         let view = UIView()
@@ -64,7 +64,7 @@ final class JobCell: UICollectionViewCell {
         return view
     }()
 
-   // MARK: Bottom View UI
+   // MARK: Bottom subview
 
     private let bottomView: UIView = {
         let view = UIView()
@@ -79,6 +79,8 @@ final class JobCell: UICollectionViewCell {
         imageView.backgroundColor = UIColor.appLightGrayColor()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.layer.cornerRadius = Constants.mediumCornerRadius
+        imageView.image = UIImage(named: "noLogo")?.withRenderingMode(.alwaysTemplate)
+        imageView.tintColor = .appLightGrayColor()
         return imageView
     }()
     
@@ -143,9 +145,9 @@ final class JobCell: UICollectionViewCell {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setupHierarchy()
-        setupLayout()
         configureView()
+        additionSubviews()
+        setupLayout()
     }
 
     required init?(coder: NSCoder) {
@@ -170,7 +172,7 @@ private extension JobCell {
 // MARK: - Setup Hierarchy
 
 private extension JobCell {
-    func setupHierarchy() {
+    func additionSubviews() {
         addSubview(mainView)
         mainView.addSubview(topView)
         mainView.addSubview(separatorView)
@@ -209,7 +211,7 @@ private extension JobCell {
             mainView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
 
-        // MARK: Top view constraints
+        // MARK: Top subview constraints
        
         NSLayoutConstraint.activate([
             topView.topAnchor.constraint(equalTo: mainView.topAnchor),
@@ -249,7 +251,7 @@ private extension JobCell {
             separatorView.heightAnchor.constraint(equalToConstant: 1),
         ])
 
-        // MARK: Bottom view constraints
+        // MARK: Bottom subview constraints
        
         NSLayoutConstraint.activate([
             bottomView.leftAnchor.constraint(equalTo: mainView.leftAnchor),
@@ -312,7 +314,7 @@ private extension JobCell {
     }
 }
 
-// MARK: - Configure cell
+// MARK: - Configure cell values
 
 extension JobCell {
     func configureCell(jobModel: JobModel) {
@@ -369,5 +371,4 @@ private enum Constants {
     static var heightOfCellParts: CGFloat = 52
     
     static var rubSymbol = "₽"
-    
 }

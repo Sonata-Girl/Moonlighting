@@ -7,6 +7,8 @@
 
 import Foundation
 
+// MARK: - Network service protocol
+
 protocol NetworkServiceProtocol {
     func getJobsRequest(completion: @escaping (Result<JobsDto, Error>) -> Void)
     func loadImageData(from url: URL, completion: @escaping (Data?) -> Void)
@@ -30,13 +32,13 @@ enum ApiType {
     }
 }
 
-// MARK: - Api Controller
+// MARK: - Network service
 
 final class NetworkService: NetworkServiceProtocol {
     static let shared = NetworkService()
     private let api = ApiType.self
     private let decoder = JSONDecoder()
-    private let imageCache = NSCache<NSString, ImageItem>()
+    private let imageCache = NSCache<NSString, ImageDataWrapper>()
     
     func getJobsRequest(completion: @escaping (Result<JobsDto, Error>) -> Void) {
         guard let url = URL(string: api.getJobs.urlString) else { return }
@@ -63,11 +65,15 @@ final class NetworkService: NetworkServiceProtocol {
     }
 
     func loadImageData(from url: URL, completion: @escaping (Data?) -> Void) {
+        if let cachedImage = imageCache.object(forKey: url.absoluteString as NSString) {
+            completion(cachedImage.imageData)
+        }
         URLSession.shared.dataTask(with: url) { data, _, error in
             guard let data = data, error == nil else {
                 completion(nil)
                 return
             }
+            self.imageCache.setObject(ImageDataWrapper(imageData: data), forKey: url.absoluteString as NSString)
             completion(data)
         }.resume()
     }
