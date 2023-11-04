@@ -189,8 +189,8 @@
 			children = (
 				676A07552AF15B9000726F27 /* AppDelegate */,
 				676A07412AF0282C00726F27 /* Models */,
-				676A074E2AF0ECA800726F27 /* Extensions */,
 				676A07492AF030FB00726F27 /* Network */,
+				676A074E2AF0ECA800726F27 /* Extensions */,
 			);
 			path = ApplicationLayer;
 			sourceTree = "<group>";

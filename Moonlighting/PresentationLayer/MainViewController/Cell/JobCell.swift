@@ -161,11 +161,22 @@ private extension JobCell {
     func configureView() {
         backgroundColor = .white
         layer.cornerRadius = Constants.mediumCornerRadius
+        layer.masksToBounds = false
+        layer.shadowColor = UIColor.black.cgColor
+        layer.shadowOpacity = 0.12
+        layer.shadowRadius = 4
+        layer.shadowPath = UIBezierPath(rect: bounds).cgPath
+        layer.shadowPath = UIBezierPath(
+            roundedRect: bounds,
+            cornerRadius: Constants.mediumCornerRadius
+        ).cgPath
     }
     
     func setDefaultStateCell() {
-        layer.borderWidth = 1
-        layer.borderColor = UIColor.appLightGrayColor().cgColor
+        layer.shadowOpacity = 0.12
+        layer.borderWidth = 0
+        layer.borderColor = nil
+        layer.shadowColor = UIColor.black.cgColor // цвет
     }
 }
 
@@ -327,15 +338,16 @@ extension JobCell {
         if let logoData = jobModel.logoData {
             employerImageView.image = UIImage(data: logoData)
         }
-        changeStateOfCell(selected: jobModel.isSelected)
+        changeStateOfSelectedCell(selected: jobModel.isSelected)
     }
 
-    func changeStateOfCell(selected: Bool) {
-        isSelected = selected
+    func changeStateOfSelectedCell(selected: Bool) {
         switch selected {
         case true :
             layer.borderColor = UIColor.appYellowColor().cgColor
             layer.borderWidth = 2
+            layer.shadowColor = UIColor.appYellowColor().cgColor
+            layer.shadowOpacity = 0.6
         case false :
             setDefaultStateCell()
         }

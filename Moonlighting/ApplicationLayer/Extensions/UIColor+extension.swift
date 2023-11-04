@@ -9,9 +9,9 @@ import UIKit
 
 extension UIColor {
     static func appYellowColor() -> UIColor {
-        UIColor(red: 255 / 255,
-                green: 204 / 255,
-                blue: 0 / 255,
+        UIColor(red: 247 / 255,
+                green: 206 / 255,
+                blue: 23 / 255,
                 alpha: 1)
     }
     

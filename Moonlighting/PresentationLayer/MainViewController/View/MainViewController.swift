@@ -60,14 +60,15 @@ final class MainViewController: UIViewController {
     
     private let reserveButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Выберите подработки", for: .normal)
-        button.setTitleColor(.gray, for: .normal)
-        button.setTitleColor(.black, for: .disabled)
+        button.setTitle(Constants.defaultReserveButtonTitle, for: .normal)
+        button.setTitleColor(.black, for: .normal)
         button.backgroundColor = .appLightGrayColor()
+        button.addTarget(nil,
+                         action: #selector(reserveButtonPressed),
+                         for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
         button.layer.cornerRadius = 8
         button.isEnabled = false
-        button.addTarget(nil, action: #selector(reserveButtonPressed), for: .touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
@@ -122,10 +123,18 @@ private extension MainViewController {
         ])
         
         NSLayoutConstraint.activate([
-            reserveButton.topAnchor.constraint(equalTo: reserveView.topAnchor, constant: Constants.indentFromSuperView),
-            reserveButton.bottomAnchor.constraint(equalTo: reserveView.bottomAnchor, constant: Constants.indentFromSuperView),
-            reserveButton.leadingAnchor.constraint(equalTo: reserveView.leadingAnchor, constant: Constants.indentFromSuperView),
-            view.safeAreaLayoutGuide.trailingAnchor.constraint(equalTo: reserveButton.trailingAnchor, constant: Constants.indentFromSuperView),
+            reserveButton.topAnchor.constraint(
+                equalTo: reserveView.topAnchor,
+                constant: Constants.indentFromSuperView
+            ),
+            reserveButton.leadingAnchor.constraint(
+                equalTo: reserveView.leadingAnchor,
+                constant: Constants.indentFromSuperView
+            ),
+            view.safeAreaLayoutGuide.trailingAnchor.constraint(
+                equalTo: reserveButton.trailingAnchor,
+                constant: Constants.indentFromSuperView
+            ),
             reserveButton.heightAnchor.constraint(equalTo: reserveView.heightAnchor,multiplier: 0.4)
         ])
     }
@@ -140,7 +149,7 @@ private extension MainViewController {
     }
     
     func filterContentForSearchText(_ searchText: String) {
-        guard let presenter = presenter else { return }
+        guard let presenter else { return }
         presenter.filteredJobs = presenter.jobs.filter { jobModel in
             if isSearchBarEmpty {
                 return false
@@ -187,12 +196,12 @@ private extension MainViewController {
         
         let layoutSection = NSCollectionLayoutSection(group: layoutGroup)
         layoutSection.contentInsets = .init(
-            top: 10,
-            leading: 10,
-            bottom: 10,
-            trailing: 10
+            top: Constants.layoutSectionInset,
+            leading: Constants.layoutSectionInset,
+            bottom: Constants.layoutSectionInset,
+            trailing: Constants.layoutSectionInset
         )
-        layoutSection.interGroupSpacing = 10
+        layoutSection.interGroupSpacing = Constants.layoutSectionInset
         return UICollectionViewCompositionalLayout(section: layoutSection)
     }
 }
@@ -204,14 +213,21 @@ private extension MainViewController {
         dataSource = UICollectionViewDiffableDataSource<Section, JobModel>(collectionView: jobsCollectionView) { [weak self]
             (collectionView: UICollectionView, indexPath: IndexPath, item: JobModel) -> UICollectionViewCell? in
             guard let self,
-                  let presenter = self.presenter else { return JobCell() }
-            let jobs = self.isFiltering ?  presenter.filteredJobs : presenter.jobs
-            let cell = jobsCollectionView.dequeueReusableCell(withReuseIdentifier: JobCell.identifier, for: indexPath) as? JobCell
+                  let presenter = self.presenter
+            else { return JobCell() }
+            let jobs = self.isFiltering ? presenter.filteredJobs : presenter.jobs
+            let cell = jobsCollectionView.dequeueReusableCell(
+                withReuseIdentifier: JobCell.identifier,
+                for: indexPath
+            ) as? JobCell
             
             let item = jobs[indexPath.row]
             
             if item.logoData == nil {
-                presenter.loadImage(jobModel: item, indexItem: indexPath.row)
+                presenter.loadImage(
+                    jobModel: item,
+                    indexItem: indexPath.row
+                )
             }
             cell?.configureCell(jobModel: item)
             return cell
@@ -222,23 +238,63 @@ private extension MainViewController {
         var snapshot = NSDiffableDataSourceSnapshot<Section, JobModel>()
         snapshot.appendSections([.main])
         snapshot.appendItems(items)
-        dataSource?.apply(snapshot, animatingDifferences: withAnimation, completion: nil)
+        dataSource?.apply(
+            snapshot,
+            animatingDifferences: withAnimation
+        )
     }
     
     func updateDataSnapshot(withAnimation: Bool = true) {
-        guard let presenter = presenter,
+        guard let presenter,
               var updatedSnapshot = dataSource?.snapshot()
         else { return }
-        updatedSnapshot.reloadItems(presenter.jobs)
-        dataSource?.apply(updatedSnapshot, animatingDifferences: true)
+        DispatchQueue.main.async {
+            updatedSnapshot.reloadItems(presenter.jobs)
+            self.dataSource?.apply(
+                updatedSnapshot,
+                animatingDifferences: withAnimation
+            )
+        }
     }
 }
+
+// MARK: - UICollectionViewDelegate
 
 extension MainViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let item = presenter?.jobs[indexPath.item] else { return }
         presenter?.jobs[indexPath.item].isSelected = !item.isSelected
-        updateDataSnapshot()
+        updateDataSnapshot(withAnimation: false)
+        updateStateReserveButton()
+    }
+    
+    private func updateStateReserveButton() {
+        guard let jobs = presenter?.jobs else { return }
+        let reservedJobs = jobs.filter { $0.isSelected }
+        if reservedJobs.count == .zero {
+            reserveButton.setTitle(
+                Constants.defaultReserveButtonTitle,
+                for: .normal
+            )
+            reserveButton.backgroundColor = .appLightGrayColor()
+            reserveButton.isEnabled = false
+        } else {
+            var postFixTitle = ""
+            let lastNumber = Int(String(reservedJobs.count.description.suffix(2))) ?? 0
+            switch lastNumber {
+                case 0 : postFixTitle = "подработок"
+                case 1 : postFixTitle = "подработку"
+                case 2...4 : postFixTitle = "подработки"
+                case 5...19 : postFixTitle = "подработок"
+                default: break
+            }
+            reserveButton.setTitle(
+                "Забронировать \(reservedJobs.count) \(postFixTitle)",
+                for: .normal
+            )
+            reserveButton.backgroundColor = .appYellowColor()
+            reserveButton.isEnabled = true
+        }
     }
 }
 
@@ -246,8 +302,11 @@ extension MainViewController: UICollectionViewDelegate {
 
 extension MainViewController: MainViewProtocol {
     func jobsLoaded() {
-        guard let presenter = presenter else { return }
-        createDataSnapshot(items: presenter.jobs, withAnimation: true)
+        guard let presenter else { return }
+        createDataSnapshot(
+            items: presenter.jobs,
+            withAnimation: true
+        )
     }
     
     func imageLoaded() {
@@ -272,7 +331,10 @@ private extension MainViewController {
 
 private enum Constants {
     static var indentFromSuperView: CGFloat = 20
+    static var layoutSectionInset: CGFloat = 10
     static let cellHeight: CGFloat = 105
+    
+    static var defaultReserveButtonTitle = "Выберите подработки"
 }
 
 
