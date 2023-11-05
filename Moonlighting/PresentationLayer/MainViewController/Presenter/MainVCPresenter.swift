@@ -24,6 +24,7 @@ protocol MainPresenterProtocol: AnyObject {
     var filteredJobs: JobsModel  { get set }
     func getJobs()
     func loadImage(jobModel: JobModel, indexItem: Int)
+    func saveSelectedCells(selectedCells: JobsModel)
 }
 
 // MARK: - Presenter
@@ -33,13 +34,17 @@ final class MainViewControllerPresenter: MainPresenterProtocol {
     let networkManager: NetworkServiceProtocol?
     var jobs: JobsModel = []
     var filteredJobs: JobsModel = []
+    var savedSelectedCells = SelectedCellsSavingModel()
     
     required init(view: MainViewProtocol,
         networkManager: NetworkServiceProtocol
     ) {
         self.view = view
         self.networkManager = networkManager
+        loadUserSaves()
     }
+    
+    // MARK: Loading data methods
     
     func getJobs() {
         networkManager?.getJobsRequest { [weak self] result in
@@ -48,6 +53,7 @@ final class MainViewControllerPresenter: MainPresenterProtocol {
                 switch result {
                 case .success(let jobs):
                     self.jobs += jobs.models
+                    self.loadSelectedCellsSettings()
                     self.view?.jobsLoaded()
                 case .failure(let error):
                     self.view?.failure(error: error)
@@ -67,4 +73,47 @@ final class MainViewControllerPresenter: MainPresenterProtocol {
             }
         }
     }
+    
+    // MARK: UserDefaults methods
+    
+    private func loadUserSaves() {
+        guard let userSelectedCells = UserDefaults.standard.value(
+            SelectedCellsSavingModel.self,
+            forKey: Constants.userSavesSelectedCellsName
+        ) else { return }
+        
+        savedSelectedCells = userSelectedCells
+    }
+    
+    private func loadSelectedCellsSettings() {
+        guard savedSelectedCells.isEmpty == false else { return }
+        
+        savedSelectedCells.forEach { savedCell in
+            if let indexJob = jobs.firstIndex(where: { 
+                $0.profession == savedCell.profession &&
+                $0.employer == savedCell.employer &&
+                $0.salary == savedCell.salary &&
+                $0.id == savedCell.id
+            }) {
+                jobs[indexJob].isSelected = true
+            }
+        }
+    }
+    
+    func saveSelectedCells(selectedCells: JobsModel) {
+        savedSelectedCells = SelectedCellsSavingModel()
+        selectedCells.forEach {
+            self.savedSelectedCells.append(SelectedCellSavingModel(jobModel: $0))
+        }
+        UserDefaults.standard.set(
+            encodable: self.savedSelectedCells,
+            forKey: Constants.userSavesSelectedCellsName
+        )
+    }
+}
+
+// MARK: - Constants
+
+private enum Constants {
+    static var userSavesSelectedCellsName = "userSavesSelectedCells"
 }

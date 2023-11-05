@@ -7,9 +7,13 @@
 
 import UIKit
 
+// MARK: - Builder protocol
+
 protocol Builder {
     static func createMainViewController() -> UIViewController
 }
+
+// MARK: - Module builder
 
 final class ModuleBuilder: Builder {
     static func createMainViewController() -> UIViewController {

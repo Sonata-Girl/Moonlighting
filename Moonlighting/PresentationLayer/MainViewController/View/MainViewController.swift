@@ -24,7 +24,7 @@ final class MainViewController: UIViewController {
     private var isFiltering: Bool {
         return searchController.isActive && !isSearchBarEmpty
     }
-
+    
     // MARK: UI elements
     
     private var searchController: UISearchController = {
@@ -79,10 +79,15 @@ final class MainViewController: UIViewController {
         configureView()
         additionSubviews()
         setupLayout()
-        configureSearchBar()
+        configureNavigationController()
         setupDataSource()
         
         presenter?.getJobs()
+    }
+
+    private func saveUserSettings() {
+        guard let presenter else { return }
+        presenter.saveSelectedCells(selectedCells: getReservedJobs())
     }
 }
 
@@ -135,15 +140,15 @@ private extension MainViewController {
                 equalTo: reserveButton.trailingAnchor,
                 constant: Constants.indentFromSuperView
             ),
-            reserveButton.heightAnchor.constraint(equalTo: reserveView.heightAnchor,multiplier: 0.4)
+            reserveButton.heightAnchor.constraint(equalTo: reserveView.heightAnchor, multiplier: 0.4)
         ])
     }
 }
 
-// MARK: - Configure Search bar
+// MARK: - Configure navigation controller
 
 private extension MainViewController {
-    func configureSearchBar() {
+    func configureNavigationController() {
         navigationItem.searchController = searchController
         searchController.searchResultsUpdater = self
     }
@@ -198,7 +203,7 @@ private extension MainViewController {
         layoutSection.contentInsets = .init(
             top: Constants.layoutSectionInset,
             leading: Constants.layoutSectionInset,
-            bottom: Constants.layoutSectionInset,
+            bottom: Constants.layoutSectionInset + Constants.cellHeight,
             trailing: Constants.layoutSectionInset
         )
         layoutSection.interGroupSpacing = Constants.layoutSectionInset
@@ -266,11 +271,11 @@ extension MainViewController: UICollectionViewDelegate {
         presenter?.jobs[indexPath.item].isSelected = !item.isSelected
         updateDataSnapshot(withAnimation: false)
         updateStateReserveButton()
+        saveUserSettings()
     }
     
     private func updateStateReserveButton() {
-        guard let jobs = presenter?.jobs else { return }
-        let reservedJobs = jobs.filter { $0.isSelected }
+        let reservedJobs = getReservedJobs()
         if reservedJobs.count == .zero {
             reserveButton.setTitle(
                 Constants.defaultReserveButtonTitle,
@@ -296,6 +301,11 @@ extension MainViewController: UICollectionViewDelegate {
             reserveButton.isEnabled = true
         }
     }
+    
+    func getReservedJobs() -> JobsModel {
+        guard let jobs = presenter?.jobs else { return JobsModel() }
+        return jobs.filter { $0.isSelected }
+    }
 }
 
 // MARK: - Loading data with network service
@@ -307,6 +317,7 @@ extension MainViewController: MainViewProtocol {
             items: presenter.jobs,
             withAnimation: true
         )
+        updateStateReserveButton()
     }
     
     func imageLoaded() {
@@ -323,7 +334,17 @@ extension MainViewController: MainViewProtocol {
 private extension MainViewController {
     
     @objc func reserveButtonPressed() {
-        print("hello")
+        showSumSalaryAlert()
+    }
+    
+    func showSumSalaryAlert() {
+        let reservedJobs = getReservedJobs().map { $0.salary }.reduce( 0, + )
+  
+        let message = "Вы заработали \(String(format: "%.2f", reservedJobs)) рублей"
+        let alert = UIAlertController(title: "", message: message, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "Ок", style: .default, handler: nil)
+        alert.addAction(okAction)
+        present(alert, animated: true)
     }
 }
 

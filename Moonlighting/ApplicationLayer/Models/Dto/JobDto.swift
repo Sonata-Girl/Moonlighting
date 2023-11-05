@@ -7,6 +7,8 @@
 
 import Foundation
 
+// MARK: - Job dto model
+
 struct JobDto: Decodable {
     let id: String
     let logo: URL?
@@ -15,6 +17,8 @@ struct JobDto: Decodable {
     let salary: Double
     let date: String
 }
+
+// MARK: - Convert JobDto to JobsModel methods
 
 extension JobDto {
     var model: JobModel {

@@ -7,6 +7,8 @@
 
 import Foundation
 
+// MARK: - Job model
+
 struct JobModel: Hashable {
     let id: String
     let logo: URL?
@@ -21,15 +23,18 @@ struct JobModel: Hashable {
         hasher.combine(id)
         hasher.combine(employer)
         hasher.combine(profession)
+        hasher.combine(salary)
     }
+    
     static func == (lhs: JobModel, rhs: JobModel) -> Bool {
         lhs.id == rhs.id &&
         lhs.employer == rhs.employer &&
-        lhs.profession == rhs.profession
+        lhs.profession == rhs.profession &&
+        lhs.salary == rhs.salary
     }
 }
 
-// MARK: - Method convert from dto
+// MARK: - Convert from dto method
 
 extension JobModel {
     init(from dto: JobDto, logoData: Data?) {
