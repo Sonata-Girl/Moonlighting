@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		674C8A082AF7D3E600FB5687 /* SelectedCellSavingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674C8A072AF7D3E600FB5687 /* SelectedCellSavingModel.swift */; };
 		676A072E2AF0269E00726F27 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676A072D2AF0269E00726F27 /* AppDelegate.swift */; };
 		676A07302AF0269E00726F27 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676A072F2AF0269E00726F27 /* SceneDelegate.swift */; };
 		676A07322AF0269E00726F27 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676A07312AF0269E00726F27 /* MainViewController.swift */; };
@@ -24,6 +25,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		674C8A072AF7D3E600FB5687 /* SelectedCellSavingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectedCellSavingModel.swift; sourceTree = "<group>"; };
 		676A072A2AF0269E00726F27 /* Moonlighting.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Moonlighting.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		676A072D2AF0269E00726F27 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		676A072F2AF0269E00726F27 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -86,6 +88,7 @@
 			children = (
 				676A07462AF0292A00726F27 /* Dto */,
 				676A07472AF02AB500726F27 /* JobModel.swift */,
+				674C8A072AF7D3E600FB5687 /* SelectedCellSavingModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -189,8 +192,8 @@
 			children = (
 				676A07552AF15B9000726F27 /* AppDelegate */,
 				676A07412AF0282C00726F27 /* Models */,
-				676A074E2AF0ECA800726F27 /* Extensions */,
 				676A07492AF030FB00726F27 /* Network */,
+				676A074E2AF0ECA800726F27 /* Extensions */,
 			);
 			path = ApplicationLayer;
 			sourceTree = "<group>";
@@ -277,6 +280,7 @@
 				676A07672AF3E39500726F27 /* ImageDataWrapper.swift in Sources */,
 				676A07522AF144BE00726F27 /* MainVCPresenter.swift in Sources */,
 				676A07482AF02AB500726F27 /* JobModel.swift in Sources */,
+				674C8A082AF7D3E600FB5687 /* SelectedCellSavingModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -8,7 +8,7 @@
 import UIKit
 
 final class JobCell: UICollectionViewCell {
-
+    
     // MARK: UI elements
 
     private let mainView: UIStackView = {
@@ -161,11 +161,22 @@ private extension JobCell {
     func configureView() {
         backgroundColor = .white
         layer.cornerRadius = Constants.mediumCornerRadius
+        layer.masksToBounds = false
+        layer.shadowColor = UIColor.black.cgColor
+        layer.shadowOpacity = 0.12
+        layer.shadowRadius = 4
+        layer.shadowPath = UIBezierPath(rect: bounds).cgPath
+        layer.shadowPath = UIBezierPath(
+            roundedRect: bounds,
+            cornerRadius: Constants.mediumCornerRadius
+        ).cgPath
     }
     
-    func setDefaultBorder() {
-        layer.borderWidth = 1
-        layer.borderColor = UIColor.appLightGrayColor().cgColor
+    func setDefaultStateCell() {
+        layer.shadowOpacity = 0.12
+        layer.borderWidth = 0
+        layer.borderColor = nil
+        layer.shadowColor = UIColor.black.cgColor // цвет
     }
 }
 
@@ -327,15 +338,18 @@ extension JobCell {
         if let logoData = jobModel.logoData {
             employerImageView.image = UIImage(data: logoData)
         }
+        changeStateOfSelectedCell(selected: jobModel.isSelected)
     }
 
-    func changeStateOfCell(selected: Bool) {
+    func changeStateOfSelectedCell(selected: Bool) {
         switch selected {
         case true :
             layer.borderColor = UIColor.appYellowColor().cgColor
             layer.borderWidth = 2
+            layer.shadowColor = UIColor.appYellowColor().cgColor
+            layer.shadowOpacity = 0.6
         case false :
-                setDefaultBorder()
+            setDefaultStateCell()
         }
     }
 
@@ -345,7 +359,8 @@ extension JobCell {
         employerLabel.text = nil
         dateLabel.text = nil
         timeLabel.text = nil
-        contentView.layer.borderWidth = 0
+        employerImageView.image = nil
+        setDefaultStateCell()
     }
 }
 
@@ -363,12 +378,12 @@ private enum Constants {
     static var lightCornerRadius: CGFloat = 6
     static var mediumCornerRadius: CGFloat = 15
     
-    static var smallFont: UIFont = .systemFont(ofSize: 15)
-    
     static var indentFromSuperView: CGFloat = 20
     static var mediumSpacingItems: CGFloat = 15
     static var smallSpacingItems: CGFloat = 10
+    
     static var heightOfCellParts: CGFloat = 52
     
+    static var smallFont: UIFont = .systemFont(ofSize: 15)
     static var rubSymbol = "₽"
 }

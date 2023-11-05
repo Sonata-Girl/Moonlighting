@@ -14,6 +14,8 @@ protocol NetworkServiceProtocol {
     func loadImageData(from url: URL, completion: @escaping (Data?) -> Void)
 }
 
+// MARK: - Api settings
+
 enum ApiType {
     case getJobs
  
