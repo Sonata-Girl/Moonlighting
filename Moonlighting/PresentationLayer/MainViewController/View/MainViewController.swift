@@ -24,7 +24,7 @@ final class MainViewController: UIViewController {
     private var isFiltering: Bool {
         return searchController.isActive && !isSearchBarEmpty
     }
-
+    
     // MARK: UI elements
     
     private var searchController: UISearchController = {
@@ -46,8 +46,30 @@ final class MainViewController: UIViewController {
         )
         collectionView.showsVerticalScrollIndicator = false
         collectionView.backgroundColor = .appLightGrayColor()
+        collectionView.delegate = self
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
+    }()
+    
+    private let reserveView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .white.withAlphaComponent(0.9)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    private let reserveButton: UIButton = {
+        let button = UIButton()
+        button.setTitle(Constants.defaultReserveButtonTitle, for: .normal)
+        button.setTitleColor(.black, for: .normal)
+        button.backgroundColor = .appLightGrayColor()
+        button.addTarget(nil,
+                         action: #selector(reserveButtonPressed),
+                         for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.layer.cornerRadius = 8
+        button.isEnabled = false
+        return button
     }()
     
     // MARK: - View controller lifecycle methods
@@ -57,10 +79,15 @@ final class MainViewController: UIViewController {
         configureView()
         additionSubviews()
         setupLayout()
-        configureSearchBar()
+        configureNavigationController()
         setupDataSource()
         
         presenter?.getJobs()
+    }
+
+    private func saveUserSettings() {
+        guard let presenter else { return }
+        presenter.saveSelectedCells(selectedCells: getReservedJobs())
     }
 }
 
@@ -77,6 +104,8 @@ private extension MainViewController {
 private extension MainViewController {
     func additionSubviews() {
         view.addSubview(jobsCollectionView)
+        view.addSubview(reserveView)
+        reserveView.addSubview(reserveButton)
     }
 }
 
@@ -90,19 +119,42 @@ private extension MainViewController {
             jobsCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             jobsCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
+        
+        NSLayoutConstraint.activate([
+            reserveView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            reserveView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            reserveView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            reserveView.heightAnchor.constraint(equalToConstant: Constants.cellHeight + Constants.indentFromSuperView)
+        ])
+        
+        NSLayoutConstraint.activate([
+            reserveButton.topAnchor.constraint(
+                equalTo: reserveView.topAnchor,
+                constant: Constants.indentFromSuperView
+            ),
+            reserveButton.leadingAnchor.constraint(
+                equalTo: reserveView.leadingAnchor,
+                constant: Constants.indentFromSuperView
+            ),
+            view.safeAreaLayoutGuide.trailingAnchor.constraint(
+                equalTo: reserveButton.trailingAnchor,
+                constant: Constants.indentFromSuperView
+            ),
+            reserveButton.heightAnchor.constraint(equalTo: reserveView.heightAnchor, multiplier: 0.4)
+        ])
     }
 }
 
-// MARK: - Configure Search bar
+// MARK: - Configure navigation controller
 
 private extension MainViewController {
-    func configureSearchBar() {
+    func configureNavigationController() {
         navigationItem.searchController = searchController
         searchController.searchResultsUpdater = self
     }
     
     func filterContentForSearchText(_ searchText: String) {
-        guard let presenter = presenter else { return }
+        guard let presenter else { return }
         presenter.filteredJobs = presenter.jobs.filter { jobModel in
             if isSearchBarEmpty {
                 return false
@@ -111,9 +163,9 @@ private extension MainViewController {
             }
         }
         if isSearchBarEmpty {
-            updateData(items: presenter.jobs, withAnimation: true)
+            createDataSnapshot(items: presenter.jobs)
         } else {
-            updateData(items: presenter.filteredJobs, withAnimation: true)
+            createDataSnapshot(items: presenter.filteredJobs)
         }
     }
 }
@@ -133,14 +185,14 @@ private extension MainViewController {
     func createLayout() -> UICollectionViewCompositionalLayout {
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1),
-            heightDimension: .absolute(105)
+            heightDimension: .absolute(Constants.cellHeight)
         )
 
         let layoutItem = NSCollectionLayoutItem(layoutSize: itemSize)
         
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1),
-            heightDimension: .absolute(105)
+            heightDimension: .absolute(Constants.cellHeight)
         )
         let layoutGroup = NSCollectionLayoutGroup.horizontal(
             layoutSize: groupSize,
@@ -149,12 +201,12 @@ private extension MainViewController {
         
         let layoutSection = NSCollectionLayoutSection(group: layoutGroup)
         layoutSection.contentInsets = .init(
-            top: 10,
-            leading: 10,
-            bottom: 10,
-            trailing: 10
+            top: Constants.layoutSectionInset,
+            leading: Constants.layoutSectionInset,
+            bottom: Constants.layoutSectionInset + Constants.cellHeight,
+            trailing: Constants.layoutSectionInset
         )
-        layoutSection.interGroupSpacing = 10
+        layoutSection.interGroupSpacing = Constants.layoutSectionInset
         return UICollectionViewCompositionalLayout(section: layoutSection)
     }
 }
@@ -166,25 +218,93 @@ private extension MainViewController {
         dataSource = UICollectionViewDiffableDataSource<Section, JobModel>(collectionView: jobsCollectionView) { [weak self]
             (collectionView: UICollectionView, indexPath: IndexPath, item: JobModel) -> UICollectionViewCell? in
             guard let self,
-                  let presenter = self.presenter else { return JobCell() }
-            let jobs = self.isFiltering ?  presenter.filteredJobs : presenter.jobs
-            let cell = jobsCollectionView.dequeueReusableCell(withReuseIdentifier: JobCell.identifier, for: indexPath) as? JobCell
+                  let presenter = self.presenter
+            else { return JobCell() }
+            let jobs = self.isFiltering ? presenter.filteredJobs : presenter.jobs
+            let cell = jobsCollectionView.dequeueReusableCell(
+                withReuseIdentifier: JobCell.identifier,
+                for: indexPath
+            ) as? JobCell
             
             let item = jobs[indexPath.row]
             
             if item.logoData == nil {
-                presenter.loadImage(jobModel: item, indexItem: indexPath.row)
+                presenter.loadImage(
+                    jobModel: item,
+                    indexItem: indexPath.row
+                )
             }
             cell?.configureCell(jobModel: item)
             return cell
         }
     }
     
-    func updateData(items: JobsModel, withAnimation: Bool) {
+    func createDataSnapshot(items: JobsModel, withAnimation: Bool = true) {
         var snapshot = NSDiffableDataSourceSnapshot<Section, JobModel>()
         snapshot.appendSections([.main])
         snapshot.appendItems(items)
-        dataSource?.apply(snapshot, animatingDifferences: true, completion: nil)
+        dataSource?.apply(
+            snapshot,
+            animatingDifferences: withAnimation
+        )
+    }
+    
+    func updateDataSnapshot(withAnimation: Bool = true) {
+        guard let presenter,
+              var updatedSnapshot = dataSource?.snapshot()
+        else { return }
+        DispatchQueue.main.async {
+            updatedSnapshot.reloadItems(presenter.jobs)
+            self.dataSource?.apply(
+                updatedSnapshot,
+                animatingDifferences: withAnimation
+            )
+        }
+    }
+}
+
+// MARK: - UICollectionViewDelegate
+
+extension MainViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let item = presenter?.jobs[indexPath.item] else { return }
+        presenter?.jobs[indexPath.item].isSelected = !item.isSelected
+        updateDataSnapshot(withAnimation: false)
+        updateStateReserveButton()
+        saveUserSettings()
+    }
+    
+    private func updateStateReserveButton() {
+        let reservedJobs = getReservedJobs()
+        if reservedJobs.count == .zero {
+            reserveButton.setTitle(
+                Constants.defaultReserveButtonTitle,
+                for: .normal
+            )
+            reserveButton.backgroundColor = .appLightGrayColor()
+            reserveButton.isEnabled = false
+        } else {
+            var postFixTitle = ""
+            let lastNumber = Int(String(reservedJobs.count.description.suffix(2))) ?? 0
+            switch lastNumber {
+                case 0 : postFixTitle = "подработок"
+                case 1 : postFixTitle = "подработку"
+                case 2...4 : postFixTitle = "подработки"
+                case 5...19 : postFixTitle = "подработок"
+                default: break
+            }
+            reserveButton.setTitle(
+                "Забронировать \(reservedJobs.count) \(postFixTitle)",
+                for: .normal
+            )
+            reserveButton.backgroundColor = .appYellowColor()
+            reserveButton.isEnabled = true
+        }
+    }
+    
+    func getReservedJobs() -> JobsModel {
+        guard let jobs = presenter?.jobs else { return JobsModel() }
+        return jobs.filter { $0.isSelected }
     }
 }
 
@@ -192,17 +312,16 @@ private extension MainViewController {
 
 extension MainViewController: MainViewProtocol {
     func jobsLoaded() {
-        guard let presenter = presenter else { return }
-        updateData(items: presenter.jobs, withAnimation: true)
+        guard let presenter else { return }
+        createDataSnapshot(
+            items: presenter.jobs,
+            withAnimation: true
+        )
+        updateStateReserveButton()
     }
     
-    func imageLoaded(indexJob: Int) {
-        guard 
-            let jobs = presenter?.jobs,
-            var updatedSnapshot = dataSource?.snapshot() 
-        else { return }
-        updatedSnapshot.reloadItems(jobs)
-        dataSource?.apply(updatedSnapshot, animatingDifferences: true)
+    func imageLoaded() {
+        updateDataSnapshot()
     }
     
     func failure(error: Error) {
@@ -210,14 +329,33 @@ extension MainViewController: MainViewProtocol {
     }
 }
 
+// MARK: - Handle actions methods
+
+private extension MainViewController {
+    
+    @objc func reserveButtonPressed() {
+        showSumSalaryAlert()
+    }
+    
+    func showSumSalaryAlert() {
+        let reservedJobs = getReservedJobs().map { $0.salary }.reduce( 0, + )
+  
+        let message = "Вы заработали \(String(format: "%.2f", reservedJobs)) рублей"
+        let alert = UIAlertController(title: "", message: message, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "Ок", style: .default, handler: nil)
+        alert.addAction(okAction)
+        present(alert, animated: true)
+    }
+}
+
 // MARK: - Constants
 
 private enum Constants {
-    static var halfOfPointAlpha: CGFloat = 0.5
-    static var veryLightAlpha: CGFloat = 0.2
+    static var indentFromSuperView: CGFloat = 20
+    static var layoutSectionInset: CGFloat = 10
+    static let cellHeight: CGFloat = 105
     
-    static let gifViewRadius: CGFloat = 8
-    static let spacingStackView: CGFloat = 5
+    static var defaultReserveButtonTitle = "Выберите подработки"
 }
 
 

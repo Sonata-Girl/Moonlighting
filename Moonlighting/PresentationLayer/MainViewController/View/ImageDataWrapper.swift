@@ -7,6 +7,8 @@
 
 import UIKit
 
+// MARK: - Image model for cache
+
 class ImageDataWrapper {
     let imageData: Data
     
