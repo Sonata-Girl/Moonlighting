@@ -1,0 +1,150 @@
+[
+  {
+    "id": "1",
+    "salary": 500,
+    "date": "2023-11-16T16:03:00Z",
+    "employer": "Наша Мебель",
+    "profession": "Слесарь"
+  },
+  {
+    "id": "2",
+    "salary": 900,
+    "logo": "https://i.imgur.com/x8DcFXl.png",
+    "date": "2023-11-16T18:49:40Z",
+    "employer": "Пятёрочка",
+    "profession": "Кассир"
+  },
+  {
+    "id": "3",
+    "salary": 800,
+    "logo": "https://i.imgur.com/wIPhLsM.jpg",
+    "date": "2023-11-16T21:36:20Z",
+    "employer": "Магнит",
+    "profession": "Мерчендайзер"
+  },
+  {
+    "id": "4",
+    "salary": 111.11,
+    "date": "2023-11-17T00:23:00Z",
+    "employer": "Mainer",
+    "profession": "iOS-разработчик"
+  },
+  {
+    "id": "5",
+    "salary": 1500,
+    "logo": "https://i.imgur.com/x8DcFXl.png",
+    "date": "2023-11-17T03:09:40Z",
+    "employer": "Пятёрочка",
+    "profession": "Грузчик"
+  },
+  {
+    "id": "6",
+    "salary": 500,
+    "logo": "https://i.imgur.com/x8DcFXl.png",
+    "date": "2023-11-17T05:56:20Z",
+    "employer": "Пятёрочка",
+    "profession": "Уборщик"
+  },
+  {
+    "id": "7",
+    "salary": 100,
+    "date": "2023-11-17T08:43:00Z",
+    "employer": "Skillbox",
+    "profession": "Преподаватель"
+  },
+  {
+    "id": "8",
+    "salary": 50000,
+    "date": "2023-11-17T11:29:40Z",
+    "employer": "Marvel",
+    "profession": "Человек-паук"
+  },
+  {
+    "id": "9",
+    "salary": 5555.55,
+    "date": "2023-11-17T14:16:20Z",
+    "employer": "Кремль",
+    "profession": "Советник"
+  },
+  {
+    "id": "10",
+    "salary": 0.01,
+    "date": "2023-11-17T17:03:00Z",
+    "employer": "МВД",
+    "profession": "Робокоп"
+  },
+  {
+    "id": "11",
+    "salary": 500,
+    "date": "2023-11-16T16:03:00Z",
+    "employer": "Наша Мебель",
+    "profession": "Слесарь"
+  },
+  {
+    "id": "12",
+    "salary": 900,
+    "logo": "https://i.imgur.com/x8DcFXl.png",
+    "date": "2023-11-16T18:49:40Z",
+    "employer": "Пятёрочка",
+    "profession": "Кассир"
+  },
+  {
+    "id": "13",
+    "salary": 800,
+    "logo": "https://i.imgur.com/wIPhLsM.jpg",
+    "date": "2023-11-16T21:36:20Z",
+    "employer": "Магнит",
+    "profession": "Мерчендайзер"
+  },
+  {
+    "id": "14",
+    "salary": 111.11,
+    "date": "2023-11-17T00:23:00Z",
+    "employer": "MyGig",
+    "profession": "iOS-разработчик"
+  },
+  {
+    "id": "15",
+    "salary": 1500,
+    "logo": "https://i.imgur.com/x8DcFXl.png",
+    "date": "2023-11-17T03:09:40Z",
+    "employer": "Пятёрочка",
+    "profession": "Грузчик"
+  },
+  {
+    "id": "16",
+    "salary": 500,
+    "logo": "https://i.imgur.com/x8DcFXl.png",
+    "date": "2023-11-17T05:56:20Z",
+    "employer": "Пятёрочка",
+    "profession": "Уборщик"
+  },
+  {
+    "id": "17",
+    "salary": 100,
+    "date": "2023-11-17T08:43:00Z",
+    "employer": "Skillbox",
+    "profession": "Преподаватель"
+  },
+  {
+    "id": "18",
+    "salary": 50000,
+    "date": "2023-11-17T11:29:40Z",
+    "employer": "Marvel",
+    "profession": "Человек-паук"
+  },
+  {
+    "id": "19",
+    "salary": 5555.55,
+    "date": "2023-11-17T14:16:20Z",
+    "employer": "Кремль",
+    "profession": "Советник"
+  },
+  {
+    "id": "20",
+    "salary": 0.01,
+    "date": "2023-11-17T17:03:00Z",
+    "employer": "МВД",
+    "profession": "Робокоп"
+  }
+]

@@ -19,11 +19,11 @@ protocol NetworkServiceProtocol {
 enum ApiType {
     case getJobs
  
-    static var baseURL: String{
-        return "http://185.174.137.159/"
+    static var baseURL: String {
+        return ""
     }
     
-    private var path: String{
+    private var path: String {
         switch self{
         case.getJobs: return "jobs"
         }
@@ -43,27 +43,35 @@ final class NetworkService: NetworkServiceProtocol {
     private let imageCache = NSCache<NSString, ImageDataWrapper>()
     
     func getJobsRequest(completion: @escaping (Result<JobsDto, Error>) -> Void) {
-        guard let url = URL(string: api.getJobs.urlString) else { return }
+//        guard let url = URL(string: api.getJobs.urlString) else { return }
          
-        URLSession.shared.dataTask(with: url) { data, response, error in
-            if let error = error {
-                completion(.failure(error))
-                print("Error: \(error.localizedDescription)")
-                return
-            }
-            
-            guard let response = response as? HTTPURLResponse,
-                  response.statusCode == 200 else { return }
-            
-            guard let data = data else { return }
-            
-            do {
-                let jobsModels = try self.decoder.decode(JobsDto.self, from: data)
+        guard let path = Bundle.main.path(forResource: "JSON", ofType: "json") else { return }
+        let jsonDecoder = JSONDecoder()
+        
+        DispatchQueue.global().async {
+            if let data = try? Data(contentsOf: URL(fileURLWithPath: path), options: .mappedIfSafe) {
+                let jobsModels = try! jsonDecoder.decode(JobsDto.self, from: data)
                 completion(.success(jobsModels))
-            } catch let error {
-                completion(.failure(error))
             }
-        }.resume()
+        }
+//        URLSession.shared.dataTask(with: url) { data, response, error in
+//            if let error = error {
+//                completion(.failure(error))
+//                print("Error: \(error.localizedDescription)")
+//                return
+//            }
+//            
+//            guard let response = response as? HTTPURLResponse,
+//                  response.statusCode == 200 else { return }
+//            
+//            guard let data = data else { return }
+//            do {
+//                let jobsModels = try self.decoder.decode(JobsDto.self, from: data)
+//                completion(.success(jobsModels))
+//            } catch let error {
+//                completion(.failure(error))
+//            }
+//        }.resume()
     }
 
     func loadImageData(from url: URL, completion: @escaping (Data?) -> Void) {

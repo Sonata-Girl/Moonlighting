@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		674BB1C92B06830500AF0BDA /* JSON.json in Resources */ = {isa = PBXBuildFile; fileRef = 674BB1C82B06830500AF0BDA /* JSON.json */; };
 		674C8A082AF7D3E600FB5687 /* SelectedCellSavingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 674C8A072AF7D3E600FB5687 /* SelectedCellSavingModel.swift */; };
+		6763A7E52B0A46EF0039EE26 /* DataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6763A7E42B0A46EF0039EE26 /* DataHelper.swift */; };
 		676A072E2AF0269E00726F27 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676A072D2AF0269E00726F27 /* AppDelegate.swift */; };
 		676A07302AF0269E00726F27 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676A072F2AF0269E00726F27 /* SceneDelegate.swift */; };
 		676A07322AF0269E00726F27 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676A07312AF0269E00726F27 /* MainViewController.swift */; };
@@ -19,13 +21,15 @@
 		676A07502AF0ECC000726F27 /* UIColor+extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676A074F2AF0ECC000726F27 /* UIColor+extension.swift */; };
 		676A07522AF144BE00726F27 /* MainVCPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676A07512AF144BE00726F27 /* MainVCPresenter.swift */; };
 		676A075B2AF18C6C00726F27 /* ModuleBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676A075A2AF18C6C00726F27 /* ModuleBuilder.swift */; };
-		676A07642AF3DAA000726F27 /* LabelWithInsets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676A07632AF3DAA000726F27 /* LabelWithInsets.swift */; };
+		676A07642AF3DAA000726F27 /* PaddingLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676A07632AF3DAA000726F27 /* PaddingLabel.swift */; };
 		676A07672AF3E39500726F27 /* ImageDataWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676A07662AF3E39500726F27 /* ImageDataWrapper.swift */; };
 		676A076D2AF3F04800726F27 /* JobDto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676A076C2AF3F04800726F27 /* JobDto.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		674BB1C82B06830500AF0BDA /* JSON.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = JSON.json; sourceTree = "<group>"; };
 		674C8A072AF7D3E600FB5687 /* SelectedCellSavingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectedCellSavingModel.swift; sourceTree = "<group>"; };
+		6763A7E42B0A46EF0039EE26 /* DataHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataHelper.swift; sourceTree = "<group>"; };
 		676A072A2AF0269E00726F27 /* Moonlighting.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Moonlighting.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		676A072D2AF0269E00726F27 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		676A072F2AF0269E00726F27 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -39,7 +43,7 @@
 		676A074F2AF0ECC000726F27 /* UIColor+extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+extension.swift"; sourceTree = "<group>"; };
 		676A07512AF144BE00726F27 /* MainVCPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainVCPresenter.swift; sourceTree = "<group>"; };
 		676A075A2AF18C6C00726F27 /* ModuleBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModuleBuilder.swift; sourceTree = "<group>"; };
-		676A07632AF3DAA000726F27 /* LabelWithInsets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelWithInsets.swift; sourceTree = "<group>"; };
+		676A07632AF3DAA000726F27 /* PaddingLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaddingLabel.swift; sourceTree = "<group>"; };
 		676A07662AF3E39500726F27 /* ImageDataWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageDataWrapper.swift; sourceTree = "<group>"; };
 		676A076C2AF3F04800726F27 /* JobDto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobDto.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -98,6 +102,7 @@
 			children = (
 				676A07312AF0269E00726F27 /* MainViewController.swift */,
 				676A07662AF3E39500726F27 /* ImageDataWrapper.swift */,
+				674BB1C82B06830500AF0BDA /* JSON.json */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -126,12 +131,13 @@
 			path = Network;
 			sourceTree = "<group>";
 		};
-		676A074E2AF0ECA800726F27 /* Extensions */ = {
+		676A074E2AF0ECA800726F27 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
 				676A074F2AF0ECC000726F27 /* UIColor+extension.swift */,
+				6763A7E42B0A46EF0039EE26 /* DataHelper.swift */,
 			);
-			path = Extensions;
+			path = Helpers;
 			sourceTree = "<group>";
 		};
 		676A07532AF144CA00726F27 /* MainViewController */ = {
@@ -173,7 +179,7 @@
 		676A07652AF3DACE00726F27 /* CustomUI */ = {
 			isa = PBXGroup;
 			children = (
-				676A07632AF3DAA000726F27 /* LabelWithInsets.swift */,
+				676A07632AF3DAA000726F27 /* PaddingLabel.swift */,
 			);
 			path = CustomUI;
 			sourceTree = "<group>";
@@ -193,7 +199,7 @@
 				676A07552AF15B9000726F27 /* AppDelegate */,
 				676A07412AF0282C00726F27 /* Models */,
 				676A07492AF030FB00726F27 /* Network */,
-				676A074E2AF0ECA800726F27 /* Extensions */,
+				676A074E2AF0ECA800726F27 /* Helpers */,
 			);
 			path = ApplicationLayer;
 			sourceTree = "<group>";
@@ -258,6 +264,7 @@
 			files = (
 				676A073A2AF026A000726F27 /* LaunchScreen.storyboard in Resources */,
 				676A07372AF026A000726F27 /* Assets.xcassets in Resources */,
+				674BB1C92B06830500AF0BDA /* JSON.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -271,11 +278,12 @@
 				676A07322AF0269E00726F27 /* MainViewController.swift in Sources */,
 				676A075B2AF18C6C00726F27 /* ModuleBuilder.swift in Sources */,
 				676A074D2AF0E40E00726F27 /* JobCell.swift in Sources */,
+				6763A7E52B0A46EF0039EE26 /* DataHelper.swift in Sources */,
 				676A072E2AF0269E00726F27 /* AppDelegate.swift in Sources */,
 				676A076D2AF3F04800726F27 /* JobDto.swift in Sources */,
 				676A07502AF0ECC000726F27 /* UIColor+extension.swift in Sources */,
 				676A074B2AF031DE00726F27 /* NetworkService.swift in Sources */,
-				676A07642AF3DAA000726F27 /* LabelWithInsets.swift in Sources */,
+				676A07642AF3DAA000726F27 /* PaddingLabel.swift in Sources */,
 				676A07302AF0269E00726F27 /* SceneDelegate.swift in Sources */,
 				676A07672AF3E39500726F27 /* ImageDataWrapper.swift in Sources */,
 				676A07522AF144BE00726F27 /* MainVCPresenter.swift in Sources */,

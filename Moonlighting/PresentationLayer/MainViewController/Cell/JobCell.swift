@@ -165,7 +165,6 @@ private extension JobCell {
         layer.shadowColor = UIColor.black.cgColor
         layer.shadowOpacity = 0.12
         layer.shadowRadius = 4
-        layer.shadowPath = UIBezierPath(rect: bounds).cgPath
         layer.shadowPath = UIBezierPath(
             roundedRect: bounds,
             cornerRadius: Constants.mediumCornerRadius
@@ -247,9 +246,8 @@ private extension JobCell {
             topView.bottomAnchor.constraint(
                 equalTo: salaryLabel.bottomAnchor,
                 constant: Constants.mediumSpacingItems
-            ),
-            salaryLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: 10)
-        ])
+            )
+         ])
         salaryLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         salaryLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
 
@@ -359,7 +357,7 @@ extension JobCell {
         employerLabel.text = nil
         dateLabel.text = nil
         timeLabel.text = nil
-        employerImageView.image = nil
+        employerImageView.image = UIImage(named: "noLogo")?.withRenderingMode(.alwaysTemplate)
         setDefaultStateCell()
     }
 }

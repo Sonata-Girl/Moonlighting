@@ -9,7 +9,7 @@ import UIKit
 
 // MARK: - Custom label with insets
 
-final class PaddingLabel: UILabel {
+ class PaddingLabel: UILabel {
     
     private var insets = UIEdgeInsets()
     

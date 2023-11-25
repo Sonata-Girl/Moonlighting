@@ -9,7 +9,7 @@ import Foundation
 
 // MARK: - Job model
 
-struct JobModel: Hashable {
+struct JobModel: Hashable, Identifiable {
     let id: String
     let logo: URL?
     let profession: String
@@ -18,19 +18,13 @@ struct JobModel: Hashable {
     let date: String
     var isSelected: Bool
     var logoData: Data?
-
+   
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
-        hasher.combine(employer)
-        hasher.combine(profession)
-        hasher.combine(salary)
     }
     
     static func == (lhs: JobModel, rhs: JobModel) -> Bool {
-        lhs.id == rhs.id &&
-        lhs.employer == rhs.employer &&
-        lhs.profession == rhs.profession &&
-        lhs.salary == rhs.salary
+        lhs.id == rhs.id
     }
 }
 
@@ -53,8 +47,12 @@ extension JobModel {
 
 extension JobModel {
     var dateFromString: Date? {
+//        let formatter = DateFormatter()
+//        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(abbreviation: "UTC")
         return formatter.date(from: date)
     }
     
