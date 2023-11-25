@@ -124,7 +124,7 @@ private extension MainViewController {
             reserveView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             reserveView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             reserveView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            reserveView.heightAnchor.constraint(equalToConstant: Constants.cellHeight + Constants.indentFromSuperView)
+            reserveView.heightAnchor.constraint(equalToConstant: Constants.cellHeight)
         ])
         
         NSLayoutConstraint.activate([
@@ -155,6 +155,7 @@ private extension MainViewController {
     
     func filterContentForSearchText(_ searchText: String) {
         guard let presenter else { return }
+       
         presenter.filteredJobs = presenter.jobs.filter { jobModel in
             if isSearchBarEmpty {
                 return false
@@ -203,7 +204,7 @@ private extension MainViewController {
         layoutSection.contentInsets = .init(
             top: Constants.layoutSectionInset,
             leading: Constants.layoutSectionInset,
-            bottom: Constants.layoutSectionInset + Constants.cellHeight,
+            bottom: Constants.cellHeight,
             trailing: Constants.layoutSectionInset
         )
         layoutSection.interGroupSpacing = Constants.layoutSectionInset
@@ -218,48 +219,48 @@ private extension MainViewController {
         dataSource = UICollectionViewDiffableDataSource<Section, JobModel>(collectionView: jobsCollectionView) { [weak self]
             (collectionView: UICollectionView, indexPath: IndexPath, item: JobModel) -> UICollectionViewCell? in
             guard let self,
-                  let presenter = self.presenter
-            else { return JobCell() }
-            let jobs = self.isFiltering ? presenter.filteredJobs : presenter.jobs
-            let cell = jobsCollectionView.dequeueReusableCell(
+                let presenter = self.presenter,
+                let cell = jobsCollectionView.dequeueReusableCell(
                 withReuseIdentifier: JobCell.identifier,
                 for: indexPath
-            ) as? JobCell
+            ) as? JobCell else { return JobCell() }
             
-            let item = jobs[indexPath.row]
+            let jobs = self.isFiltering ? presenter.filteredJobs : presenter.jobs
+            let item = jobs[indexPath.item]
             
             if item.logoData == nil {
                 presenter.loadImage(
                     jobModel: item,
-                    indexItem: indexPath.row
+                    indexItem: indexPath.item
                 )
             }
-            cell?.configureCell(jobModel: item)
+            cell.configureCell(jobModel: item)
             return cell
         }
     }
     
-    func createDataSnapshot(items: JobsModel, withAnimation: Bool = true) {
+    func createDataSnapshot(items: JobsModel) {
         var snapshot = NSDiffableDataSourceSnapshot<Section, JobModel>()
         snapshot.appendSections([.main])
         snapshot.appendItems(items)
         dataSource?.apply(
             snapshot,
-            animatingDifferences: withAnimation
+            animatingDifferences: false
         )
     }
     
-    func updateDataSnapshot(withAnimation: Bool = true) {
+    func updateDataSnapshot(withAnimation: Bool = false) {
         guard let presenter,
-              var updatedSnapshot = dataSource?.snapshot()
-        else { return }
-        DispatchQueue.main.async {
+            var updatedSnapshot = dataSource?.snapshot() else { return }
+        if isSearchBarEmpty {
             updatedSnapshot.reloadItems(presenter.jobs)
-            self.dataSource?.apply(
-                updatedSnapshot,
-                animatingDifferences: withAnimation
-            )
+        } else {
+            updatedSnapshot.reloadItems(presenter.filteredJobs)
         }
+        self.dataSource?.apply(
+            updatedSnapshot,
+            animatingDifferences: withAnimation
+        )
     }
 }
 
@@ -267,9 +268,9 @@ private extension MainViewController {
 
 extension MainViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let item = presenter?.jobs[indexPath.item] else { return }
-        presenter?.jobs[indexPath.item].isSelected = !item.isSelected
-        updateDataSnapshot(withAnimation: false)
+        guard let presenter else { return }
+        presenter.jobs[indexPath.item].isSelected.toggle()
+        updateDataSnapshot()
         updateStateReserveButton()
         saveUserSettings()
     }
@@ -313,15 +314,14 @@ extension MainViewController: UICollectionViewDelegate {
 extension MainViewController: MainViewProtocol {
     func jobsLoaded() {
         guard let presenter else { return }
-        createDataSnapshot(
-            items: presenter.jobs,
-            withAnimation: true
-        )
+        createDataSnapshot( items: presenter.jobs)
         updateStateReserveButton()
     }
     
     func imageLoaded() {
-        updateDataSnapshot()
+        DispatchQueue.main.async {
+            self.updateDataSnapshot()
+        }
     }
     
     func failure(error: Error) {
